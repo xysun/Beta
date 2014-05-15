@@ -57,16 +57,25 @@ def test_single_file(fname):
         if beta.enabled:
             beta.wrapped_f(beta.test_input)
 
+def test_directory(dir_name, recursive = False):
+    pass
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("files", nargs = '+', help = 'files to test')
-    #parser.add_argument("--all", help = "force test all cases", action = "store_true")
-    #parser.add_argument('-r', help = 'test recursively')
+    parser.add_argument("-f", nargs = '+', help = 'files to test')
+    parser.add_argument('-d', help = 'test single directory')
+    parser.add_argument('-r', help = 'recursively test single directory')
 
     args = parser.parse_args()
-    if len(args.files) > 0:
-        for fname in args.files:
+    if args.f and len(args.f) > 0:
+        for fname in args.f:
             test_single_file(fname)
+
+    if args.d:
+        test_directory(args.d)
+    
+    if args.r:
+        test_directory(args.r, recursive = True)
 
 def main():
     parse_args()

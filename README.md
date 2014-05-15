@@ -4,8 +4,8 @@
 
 * run `./beta.py f.py` for a quick example
 * command-line interface ("beta"): 
-    * `beta file1 file2 ...`: test provided files
-    * `beta dir`: test current directory (non-recursive)
+    * `beta -f file1 file2 ...`: test provided files
+    * `beta -d dir`: test current directory (non-recursive)
     * `beta -r dir`: recursively test current directory
 * [DONE] functions can be normally used even with decorators
 * allow assert against exceptions
