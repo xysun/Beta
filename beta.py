@@ -37,9 +37,12 @@ class Beta(KeepRefs):
         wraps(f)
         def wrapped_f(*args): # replace f after decoration
             if self.enabled:
-                o = f(self.test_input)
+                if isinstance(self.test_input, tuple):
+                    o = f(*self.test_input)
+                else:
+                    o = f(self.test_input)
                 assert o == self.test_output
-                print ("Testing function [", f.__name__, "], test passed..")
+                print ("Testing function [" + f.__name__ + "], passed...")
             return f(*args)
         self.wrapped_f = wrapped_f
         return wrapped_f
@@ -55,7 +58,10 @@ def test_single_file(fname):
     for beta in betas:
         beta.enabled = True
         if beta.enabled:
-            beta.wrapped_f(beta.test_input)
+            if isinstance(beta.test_input, tuple):
+                beta.wrapped_f(*beta.test_input)
+            else:
+                beta.wrapped_f(beta.test_input)
 
 def test_directory(dir_name, recursive = False):
     pass
