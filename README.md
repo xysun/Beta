@@ -25,7 +25,8 @@
 @test(input = 4, output = 5) 
 @test(input = 'in.json', output = 'out.json')
 
-### Todo
+### Todo | bug fixes
 
 * identify whether it's a python script or a directory
 * make `./beta.py` a proper command `beta`
+* multiple decorators, the first function name is "wrapped_f"

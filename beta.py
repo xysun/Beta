@@ -64,6 +64,11 @@ def test_single_file(fname):
                 beta.wrapped_f(beta.test_input)
 
 def test_directory(dir_name, recursive = False):
+    '''
+    if not recursive:
+        for root, dirs, files in os.walk(dir_name):
+            if root == dir_name:
+    '''            
     pass
 
 def parse_args():
