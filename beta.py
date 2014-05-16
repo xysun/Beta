@@ -71,6 +71,16 @@ def test_directory(dir_name, recursive = False):
     '''            
     pass
 
+
+#@Beta('test/f.py', 'test.f')
+#@Beta('f.py', 'f')
+def path_to_module(path):
+    '''
+    convert path to proper import module name
+    '''
+    pass
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", nargs = '+', help = 'files to test')
@@ -87,6 +97,10 @@ def parse_args():
     
     if args.r:
         test_directory(args.r, recursive = True)
+
+@Beta(1,2)
+def f(x):
+    return 2
 
 def main():
     parse_args()
