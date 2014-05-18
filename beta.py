@@ -9,6 +9,19 @@ import weakref
 from collections import defaultdict
 from functools import wraps
 
+class BetaErrors(Exception):
+    """
+    base exception class
+    """
+    pass
+
+class NotAModuleError(BetaErrors):
+    def __init__(self, path):
+        self.path = path
+    
+    def __str__(self):
+        return self.path + " is not a valid module path"
+
 class KeepRefs(object):
     """
     to find all Test instances, so that we can enable/disable unittest externally by changing test.enabled
@@ -25,13 +38,24 @@ class KeepRefs(object):
             if inst is not None:
                 yield inst
 
+class Pipe(object):
+    
+    def __init__(self, function):
+        self.function = function
+
+    def __ror__(self, other):
+        return self.function(other)
+
+    def __call__(self, *args, **kwargs):
+        return Pipe(lambda x : self.function(x, *args, **kwargs))
+
 
 class Beta(KeepRefs):
-    def __init__(self, test_input, test_output, enabled = False):
+    def __init__(self, test_input, test_output):
         super(Beta, self).__init__()
         self.test_input = test_input
         self.test_output = test_output
-        self.enabled = enabled
+        self.enabled = False
 
     def __call__(self, f): # only invoked once during decoration
         wraps(f)
@@ -41,14 +65,17 @@ class Beta(KeepRefs):
                     o = f(*self.test_input)
                 else:
                     o = f(self.test_input)
-                assert o == self.test_output
-                print ("Testing function [" + f.__name__ + "], passed...")
+                if o == self.test_output:
+                    print ("Testing function [" + f.__name__ + "], passed...")
+                else:
+                    print ("Testing function [" + f.__name__ + "], failed..")
             return f(*args)
         self.wrapped_f = wrapped_f
         return wrapped_f
 
 def test_single_file(fname):
-    module_name = fname.split('.py')[0]
+    module_path, module_name = path_to_module(fname)
+    sys.path.insert(0, module_path)
     m = importlib.import_module(module_name)
     
     for name, obj in inspect.getmembers(m):
@@ -72,13 +99,24 @@ def test_directory(dir_name, recursive = False):
     pass
 
 
-#@Beta('test/f.py', 'test.f')
-#@Beta('f.py', 'f')
+@Beta('test/f.py', ('./test', 'f'))
+@Beta('test/test1/f2.py', ('./test/test1', 'f2'))
+@Beta('f.py', ('.', 'f'))
+#@Beta('f', NotAModuleError('f'))
 def path_to_module(path):
     '''
     convert path to proper import module name
     '''
-    pass
+    if path[-3:] != ".py":
+        raise NotAModuleError(path)
+    module_name = path[:-3].split('/')[-1]
+    last_index = path.find('/' + module_name + '.py')
+    if last_index == -1:
+        module_path = '.'
+    else:
+        module_path = './' + path[:last_index]
+    
+    return module_path, module_name
 
 
 def parse_args():
@@ -97,10 +135,6 @@ def parse_args():
     
     if args.r:
         test_directory(args.r, recursive = True)
-
-@Beta(1,2)
-def f(x):
-    return 2
 
 def main():
     parse_args()

@@ -39,6 +39,7 @@
 * multiple decorators, the first function name is "wrapped_f"
 * cannot handle function with no arguments
 * better assert message
-* cannot handle single file paths (absolute / relative)
-* test all cases, report failure (right now stop when encountering first fail)
-* avoid namespace in beta.py (otherwise currently it'll test beta.py as well)
+* ~~handle relative paths import~~
+* test all cases, report #success, #failure (follow python `unittest` output)
+* avoid testing beta.py when testing other files
+* how to catch raised exceptions? 
