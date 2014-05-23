@@ -31,4 +31,4 @@
 * how to catch raised exceptions? 
 * more assert methods
 * support json input/output files? 
-* clean import namespace after one file
+* clean import namespace after each file? 

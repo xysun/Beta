@@ -57,11 +57,12 @@ class Beta(KeepRefs):
         self.test_input = test_input
         self.test_output = test_output
         self.enabled = False
+        self.tested = False
 
     def __call__(self, f): # only invoked once during decoration
         wraps(f)
         def wrapped_f(*args): # replace f after decoration
-            if self.enabled:
+            if self.enabled and not self.tested:
                 if isinstance(self.test_input, tuple):
                     o = f(*self.test_input)
                 else:
@@ -70,6 +71,7 @@ class Beta(KeepRefs):
                     print ("Testing function [" + f.__name__ + "], passed...")
                 else:
                     print ("Testing function [" + f.__name__ + "], failed..")
+                self.tested = True
             return f(*args)
         self.wrapped_f = wrapped_f
         return wrapped_f
@@ -90,6 +92,7 @@ def test_single_file(fname):
                 beta.wrapped_f(*beta.test_input)
             else:
                 beta.wrapped_f(beta.test_input)
+    clean_import(module_name)
 
 def test_directory(dir_name, recursive = False):
     """
@@ -122,6 +125,22 @@ def path_to_module(path):
         module_path = './' + path[:last_index]
     
     return module_path, module_name
+
+
+def clean_import(modname):
+    from sys import modules
+    try:    
+        thismod = modules[modname]
+    except KeyError:
+        raise ValueError(modname)
+    del modules[modname]
+    for mod in modules.values():
+        try:
+            delattr(mod, modname)
+            delattr(mod, 'Beta')
+        except AttributeError:
+            pass
+    # delete all Beta instances from environment
 
 
 def parse_args():
