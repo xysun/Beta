@@ -3,6 +3,7 @@
 import argparse
 import importlib
 import inspect
+import os
 import pdb
 import sys
 import weakref
@@ -91,21 +92,25 @@ def test_single_file(fname):
                 beta.wrapped_f(beta.test_input)
 
 def test_directory(dir_name, recursive = False):
-    '''
-    if not recursive:
-        for root, dirs, files in os.walk(dir_name):
-            if root == dir_name:
-    '''            
-    pass
+    """
+    test python scripts within directory
+    """
+    for dirpath, dirnames, filenames in os.walk(dir_name):
+        for filename in filenames:
+            if filename[-3:] == '.py':
+                fpath = os.path.join(dirpath, filename)
+                if recursive or (not recursive and fpath == os.path.join(dir_name, filename)):
+                    print("Testing file..", fpath)
+                    test_single_file(fpath)
 
 
-@Beta('test/f.py', ('./test', 'f'))
-@Beta('test/test1/f2.py', ('./test/test1', 'f2'))
-@Beta('f.py', ('.', 'f'))
-#@Beta('f', NotAModuleError('f'))
+#@Beta('test/f.py', ('./test', 'f'))
+#@Beta('test/test1/f2.py', ('./test/test1', 'f2'))
+#@Beta('f.py', ('.', 'f'))
+#@Beta('f', assertRaises(NotAModuleError, "'f' is not a valid module path"))
 def path_to_module(path):
     '''
-    convert path to proper import module name
+    convert file path to proper import module path and name
     '''
     if path[-3:] != ".py":
         raise NotAModuleError(path)

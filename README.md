@@ -5,8 +5,8 @@
 * run `./beta.py -f f.py` for a quick example
 * command-line interface ("beta"): 
     * `beta -f file1 file2 ...`: test provided files
-    * `beta -d dir`: test current directory (non-recursive)
-    * `beta -r dir`: recursively test current directory
+    * `beta -d dir`: test all Python scripts within directory (non-recursive)
+    * `beta -r dir`: recursively test all Python scripts within directory
 * functions can be used as normal even after being decorated
 * allow assert against exceptions
 * trace will point out file --> function --> test case
@@ -14,32 +14,21 @@
 
 ### API:
 
-* style 1: `@test(input = 4, assertEqual(return, 5))`
-
-    can assert against all variables reacheable in the function
-    support all unittest assert methods (use unittest underneath?)
-       [https://docs.python.org/3/library/unittest.html?highlight=unittest#unittest.TestCase.assertEqual]
-    for variables not found, default treat as return value (?)
-
-* style 2:
-
-    default to assertEqual
-    also allow files
-
-    ```
-    @test(input = 4, output = 5) 
-    @test(input = 'in.json', output = 'out.json')
-    ```
+* available test calls:
+    * `@Beta(4, 5)` -- assert output == 5 when input == 4
+    * `@Beta(4, assertRaises(Exception, msg = None))` -- assert `Exception` will be raised with message `msg` when input == 4
 
 
 ### Todo | bug fixes
 
-* identify whether it's a python script or a directory
 * make `./beta.py` a proper command `beta`
-* multiple decorators, the first function name is "wrapped_f"
+* multiple decorators, all function names except last are shown as "wrapped_f"
 * cannot handle function with no arguments
 * better assert message
-* ~~handle relative paths import~~
+* ~~handle relative paths import (both non-recursive and recursive) ~~
 * test all cases, report #success, #failure (follow python `unittest` output)
 * avoid testing beta.py when testing other files
 * how to catch raised exceptions? 
+* more assert methods
+* support json input/output files? 
+* clean import namespace after one file
